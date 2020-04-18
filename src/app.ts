@@ -1,5 +1,7 @@
-function getName(name: string) {
-  return name;
-}
+import { GameEngine } from './game-engine';
 
-console.log(getName('app'));
+window.onload = () => {
+    const hostElement = document.getElementById('host');
+    const gameEngine = new GameEngine(hostElement);
+    window.onresize = () => gameEngine.resize();
+};
