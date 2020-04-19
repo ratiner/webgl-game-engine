@@ -88,7 +88,7 @@ export class SpriteRenderer {
     }
 }
 
-const SpriteShader: ShaderSource = {
+export const SpriteShader: ShaderSource = {
     id: 'sprite-shader',
 
     vertexShader: `

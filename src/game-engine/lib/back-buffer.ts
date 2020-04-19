@@ -1,5 +1,4 @@
 import { ShaderSource, Shader } from './shader';
-import { Drawable } from './drawable';
 import { GameContext } from '..';
 
 export interface BackBufferOptions {
@@ -7,7 +6,7 @@ export interface BackBufferOptions {
     height?: number;
 }
 
-export class BackBuffer implements Drawable {
+export class BackBuffer {
     public width: number;
     public height: number;
     public frameBuffer: WebGLFramebuffer;

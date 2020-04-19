@@ -1,6 +1,6 @@
 import { mat4 } from 'gl-matrix';
-import { BackBuffer } from './lib/back-buffer';
 import { ResourceManager } from './lib/resource-manager';
+import { BackBuffer, BlendMode } from '.';
 
 export abstract class GameContext {
     abstract setup(): void;
@@ -17,7 +17,6 @@ export abstract class GameContext {
 
     private host: HTMLElement;
     private canvas: HTMLCanvasElement;
-    private backBuffer: BackBuffer;
 
     constructor() {
         // Setup
@@ -32,7 +31,6 @@ export abstract class GameContext {
 
         // Initialize Engine
         this.resources = new ResourceManager(this.gl);
-        this.backBuffer = new BackBuffer(this, { width: 1920, height: 1080 });
 
         this.setup(); // Let user handle additional setup stuff
     }
@@ -62,24 +60,44 @@ export abstract class GameContext {
         this.drawLoop();
     }
 
+    setBuffer(buffer: BackBuffer) {
+        const gl = this.gl;
+        if (!!buffer) {
+            gl.viewport(0, 0, buffer.width, buffer.height);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.frameBuffer);
+        } else {
+            // main buffer
+            gl.viewport(0, 0, this.width, this.height);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        }
+    }
+
+    setBlendMode(blndMode: BlendMode): void {
+        const gl = this.gl;
+
+        switch (blndMode) {
+            case BlendMode.ALPHA:
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                break;
+            case BlendMode.ADDITIVE:
+                gl.blendFunc(gl.ONE, gl.ONE);
+                break;
+            case BlendMode.MULTIPLY:
+                gl.blendFunc(gl.DST_COLOR, gl.ZERO);
+                break;
+        }
+    }
+
     private drawLoop() {
         // TODO: fps calc
         const gl = this.gl;
 
-        // Activate back buffer
-        gl.viewport(0, 0, this.backBuffer.width, this.backBuffer.height);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.backBuffer.frameBuffer);
+        // Activate main buffer
+        this.setBuffer(null);
+        this.setBlendMode(BlendMode.ALPHA);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         this.draw();
-
-        // Activate main buffer
-        gl.viewport(0, 0, this.width, this.height);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-        this.backBuffer.draw();
 
         gl.flush();
 

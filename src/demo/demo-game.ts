@@ -1,11 +1,11 @@
-import { SpriteRenderer } from 'src/game-engine/lib/renderers/SpriteRenderer';
-import { Texture2D } from 'src/game-engine/lib/texture-2d';
-import { GameContext } from 'src/game-engine';
+import { GameContext, GameLayer } from 'src/game-engine';
+import { WelcomeScene } from './scenes/welcome.scene';
+import { Test2Scene } from './scenes/test2.scene';
 
 export class DemoGame extends GameContext {
-    renderer: SpriteRenderer;
-    pos: number = 0;
-    index: number = 0;
+    currentScene: GameLayer;
+    welcomeScene: WelcomeScene;
+    test2Scene: Test2Scene;
 
     constructor() {
         super();
@@ -14,38 +14,27 @@ export class DemoGame extends GameContext {
         this.attach(hostElement);
         // Bind to events
         window.onresize = () => this.resize();
+
+        window.onmousewheel = (ev: WheelEvent) => {
+            if (ev.deltaY < 0) {
+                if (!(this.currentScene instanceof Test2Scene)) {
+                    this.currentScene = this.test2Scene;
+                }
+            } else if (ev.deltaY > 0) {
+                if (!(this.currentScene instanceof Test2Scene)) {
+                    this.currentScene = this.test2Scene;
+                }
+            }
+        };
     }
 
     setup() {
-        const { gl } = this;
-
-        // TODO: Preload shaders / textures here
-        this.renderer = new SpriteRenderer(this);
-        const background = new Texture2D(gl, '/assets/bg.png', false);
-        this.resources.textures['background'] = background;
-        const dino = new Texture2D(gl, '/assets/dino.png', true);
-        this.resources.textures['dino'] = dino;
+        this.welcomeScene = new WelcomeScene(this);
+        this.test2Scene = new Test2Scene(this);
+        this.currentScene = this.welcomeScene;
     }
 
     draw() {
-        const { width, height, resources } = this;
-
-        const d = new Date() as any;
-        this.index = Math.floor((d * 0.006) % 5);
-        this.pos += 1;
-        // render scene
-        this.renderer.render(resources.textures['background'], {
-            position: [-this.pos % width, 0],
-            size: [width + (this.pos % width), height],
-            offset: [this.pos % width, 0],
-        });
-
-        this.renderer.render(resources.textures['dino'], {
-            position: [20 + (this.pos % width), height - 290],
-            size: [360, 250],
-            spriteSize: [685, 475],
-            offset: [this.index * 685, 0],
-            rotate: 0,
-        });
+        this.currentScene.draw();
     }
 }
