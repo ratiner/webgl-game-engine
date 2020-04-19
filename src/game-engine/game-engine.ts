@@ -24,7 +24,7 @@ export class GameEngine {
         // Initialize Game Context
         this.context = new GameContext(this.gl);
         this.resize();
-        this.backBuffer = new BackBuffer(this.context, { width: 512, height: 512 });
+        this.backBuffer = new BackBuffer(this.context, { width: 1920, height: 1080 });
 
         // Begin Draw Loop
         hostElement.appendChild(this.canvas);

@@ -17,6 +17,8 @@ export class GameContext {
 
         const background = new Texture2D(this.gl, '/assets/bg.png', false);
         this.resources.textures['background'] = background;
+        const dino = new Texture2D(this.gl, '/assets/dino.png', true);
+        this.resources.textures['dino'] = dino;
     }
 
     onResize(width: number, height: number) {
@@ -29,11 +31,24 @@ export class GameContext {
         this.resources.setShaderProjection(projection);
     }
 
+    pos: number = 0;
+    index: number = 0;
     onRender() {
+        const d = new Date() as any;
+        this.index = Math.floor((d * 0.01) % 7);
+        this.pos += 3;
         // render scene
         this.renderer.render(this.resources.textures['background'], {
             position: [0, 0],
             size: [this.width, this.height],
+        });
+
+        this.renderer.render(this.resources.textures['dino'], {
+            position: [20 + (this.pos % this.width), this.height - 290],
+            size: [360, 250],
+            spriteSize: [685, 475],
+            spriteIndex: [this.index, 7],
+            rotate: 0,
         });
     }
 

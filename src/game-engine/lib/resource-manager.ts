@@ -1,4 +1,4 @@
-import { Shader, ShaderSource } from './shaders';
+import { Shader, ShaderSource } from './shader';
 import { Texture2D } from './texture-2d';
 import { mat4 } from 'gl-matrix';
 

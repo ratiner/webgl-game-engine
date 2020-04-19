@@ -1,5 +1,5 @@
 import { GameContext } from './game-context';
-import { ShaderSource, Shader } from './shaders';
+import { ShaderSource, Shader } from './shader';
 
 export interface BackBufferOptions {
     width?: number;
@@ -41,31 +41,15 @@ export class BackBuffer {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer);
 
-        // prettier-ignore
-        const rectArray = new Float32Array([
-        //   POS    TEX
-            0, 1, -1, -1,
-            1, 0,  1, -1,
-            0, 0, -1,  1,
-          
-            0, 1, -1,  1,
-            1, 1,  1, -1,
-            1, 0,  1,  1
-        ]);
-
         this.buffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, rectArray, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, this.getVertexMatrix(), gl.STATIC_DRAW);
 
-        const positionIndex = this.shader.getAttributeIndex('vertex');
-        gl.enableVertexAttribArray(positionIndex);
-        gl.vertexAttribPointer(positionIndex, 4, gl.FLOAT, false, 4 * 4, 0);
-
+        // cleanup
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
         gl.bindTexture(gl.TEXTURE_2D, null);
-        gl.bindTexture(gl.RENDERBUFFER, null);
-        gl.bindTexture(gl.FRAMEBUFFER, null);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
     render() {
@@ -76,9 +60,30 @@ export class BackBuffer {
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         this.shader.setInteger('image', 0);
 
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        const positionIndex = this.shader.getAttributeIndex('vertex');
+        gl.enableVertexAttribArray(positionIndex);
+        gl.vertexAttribPointer(positionIndex, 4, gl.FLOAT, false, 4 * 4, 0);
+
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
 
+        // cleanup
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
         gl.useProgram(null);
+    }
+
+    private getVertexMatrix(): Float32Array {
+        // prettier-ignore
+        return new Float32Array([
+        //  POS      TEX
+            -1,  1, 0, 1,
+             1, -1, 1, 0,
+            -1, -1, 0, 0,
+                    
+            -1,  1, 0, 1,
+             1,  1, 1, 1,
+             1, -1, 1, 0
+        ]);
     }
 }
 
