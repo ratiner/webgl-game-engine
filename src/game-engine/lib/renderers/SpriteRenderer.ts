@@ -1,15 +1,15 @@
 import { mat4 } from 'gl-matrix';
 import { Shader } from '../shader';
 import { Texture2D } from '../texture-2d';
-import { GameContext } from '../game-context';
 import { ShaderSource } from '../shader';
+import { GameContext } from '../../';
 
 export interface SpriteRenderOptions {
     position: [number, number];
     size: [number, number];
     rotate?: number;
     spriteSize?: [number, number];
-    spriteIndex?: [number, number];
+    offset?: [number, number];
 }
 
 export class SpriteRenderer {
@@ -31,7 +31,7 @@ export class SpriteRenderer {
             return;
         }
 
-        const { position, size, rotate, spriteSize, spriteIndex } = opts;
+        const { position, size, rotate, spriteSize, offset } = opts;
         const gl = this.context.gl;
 
         this.shader.use();
@@ -50,7 +50,10 @@ export class SpriteRenderer {
         // sprite
         const uv_x = spriteSize ? spriteSize[0] / texture.width : 1;
         const uv_y = spriteSize ? spriteSize[1] / texture.height : 1;
-        this.shader.setVector2fVec2('spriteIndex', spriteIndex ? spriteIndex : [0, 0]);
+        const offset_x = offset ? offset[0] / texture.width : 0;
+        const offset_y = offset ? offset[1] / texture.height : 0;
+
+        this.shader.setVector2fXy('offset', offset_x, offset_y);
         this.shader.setVector2fXy('spriteSize', uv_x, uv_y);
 
         // draw
@@ -107,12 +110,12 @@ const SpriteShader: ShaderSource = {
     uniform sampler2D image;
 
     uniform vec2 spriteSize;
-    uniform vec2 spriteIndex;
+    uniform vec2 offset;
 
     varying vec2 texCoord;
 
     void main() {
-        gl_FragColor = texture2D(image, (texCoord + spriteIndex) * spriteSize);
+        gl_FragColor = texture2D(image, texCoord * spriteSize + offset);
     }
     `,
 };

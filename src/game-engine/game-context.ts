@@ -1,42 +1,65 @@
-import { GameContext } from './lib/game-context';
+import { mat4 } from 'gl-matrix';
 import { BackBuffer } from './lib/back-buffer';
+import { ResourceManager } from './lib/resource-manager';
 
-export class GameEngine {
+export abstract class GameContext {
+    abstract setup(): void;
+    abstract draw(): void;
+    get width(): number {
+        return this.canvas.width;
+    }
+    get height(): number {
+        return this.canvas.height;
+    }
+
+    resources: ResourceManager;
+    gl: WebGL2RenderingContext;
+
     private host: HTMLElement;
     private canvas: HTMLCanvasElement;
-    private gl: WebGL2RenderingContext;
-    private context: GameContext;
     private backBuffer: BackBuffer;
 
-    constructor(hostElement: HTMLElement) {
+    constructor() {
         // Setup
-        this.host = hostElement;
         this.canvas = document.createElement('canvas');
         this.canvas.style.backgroundColor = 'black';
         this.canvas.style.overflow = 'hidden'; // Prevents white spacesw hen resizing (where scrolls used to be)
-        this.host.style.overflow = 'hidden'; // Prevents white spacesw hen resizing (where scrolls used to be)
 
         // Initialize WebGL Context
         this.gl = this.canvas.getContext('webgl2');
         this.gl.clearColor(0.4, 0.6, 1.0, 0.0);
         this.gl.enable(this.gl.BLEND);
 
-        // Initialize Game Context
-        this.context = new GameContext(this.gl);
-        this.resize();
-        this.backBuffer = new BackBuffer(this.context, { width: 1920, height: 1080 });
+        // Initialize Engine
+        this.resources = new ResourceManager(this.gl);
+        this.backBuffer = new BackBuffer(this, { width: 1920, height: 1080 });
 
-        // Begin Draw Loop
-        hostElement.appendChild(this.canvas);
-        this.drawLoop();
+        this.setup(); // Let user handle additional setup stuff
     }
 
     resize(width?: number, height?: number) {
+        if (!this.host) {
+            console.error('cannot resize before attaching');
+            return;
+        }
+
         width = width ? width : this.host.clientWidth;
         height = height ? height : this.host.clientHeight;
         this.canvas.width = width;
         this.canvas.height = height;
-        this.context.onResize(width, height);
+
+        // Set Projection
+        const projection = mat4.create();
+        mat4.ortho(projection, 0, width, height, 0, -1, 1);
+        this.resources.setShaderProjection(projection);
+    }
+
+    attach(hostElement: HTMLElement): void {
+        this.host = hostElement;
+        this.host.style.overflow = 'hidden'; // Prevents white spacesw hen resizing (where scrolls used to be)
+        this.host.appendChild(this.canvas);
+        this.resize();
+        this.drawLoop();
     }
 
     private drawLoop() {
@@ -48,15 +71,15 @@ export class GameEngine {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.backBuffer.frameBuffer);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        this.context.onRender();
+        this.draw();
 
         // Activate main buffer
-        gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        gl.viewport(0, 0, this.width, this.height);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-        this.backBuffer.render();
+        this.backBuffer.draw();
 
         gl.flush();
 

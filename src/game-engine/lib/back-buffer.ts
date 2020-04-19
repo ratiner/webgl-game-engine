@@ -1,12 +1,13 @@
-import { GameContext } from './game-context';
 import { ShaderSource, Shader } from './shader';
+import { Drawable } from './drawable';
+import { GameContext } from '..';
 
 export interface BackBufferOptions {
     width?: number;
     height?: number;
 }
 
-export class BackBuffer {
+export class BackBuffer implements Drawable {
     public width: number;
     public height: number;
     public frameBuffer: WebGLFramebuffer;
@@ -52,7 +53,7 @@ export class BackBuffer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
-    render() {
+    draw() {
         const gl = this.context.gl;
         this.shader.use();
 

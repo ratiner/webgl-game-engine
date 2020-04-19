@@ -1,3 +1,1 @@
-import { GameEngine } from './game-engine';
-
-export { GameEngine };
+export * from './game-context';
