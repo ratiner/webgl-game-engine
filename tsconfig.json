@@ -1,16 +1,14 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "./dist/",
-    "sourceMap": true,
-    "declaration": false,
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "importHelpers": true,
-    "target": "es2015",
-    "lib": ["es2018", "dom"]
-  }
+    "compilerOptions": {
+        "baseUrl": "./",
+        "outDir": "./dist/cjs/",
+        "sourceMap": true,
+        "declaration": false,
+        "downlevelIteration": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "es5",
+        "lib": ["es2015", "dom"]
+    },
+    "exclude": ["node_modules", "dist", "scripts"]
 }

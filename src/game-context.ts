@@ -1,6 +1,7 @@
 import { mat4 } from 'gl-matrix';
-import { ResourceManager } from './lib/resource-manager';
-import { BackBuffer, BlendMode } from '.';
+import { ResourceManager } from './core/resource-manager';
+import { BackBuffer } from './core/back-buffer';
+import { BlendMode } from './core/enums';
 
 export abstract class GameContext {
     abstract setup(): void;

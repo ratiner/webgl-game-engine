@@ -1,5 +1,5 @@
-import { ShaderSource, Shader } from './shader';
-import { GameContext } from '..';
+import { Shader, ShaderSource } from './shader';
+import { GameContext } from '../game-context';
 
 export interface BackBufferOptions {
     width?: number;

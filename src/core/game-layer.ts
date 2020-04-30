@@ -1,4 +1,7 @@
-import { GameObject, BackBuffer, GameContext, BackBufferOptions, BlendMode } from '..';
+import { GameContext } from '../game-context';
+import { GameObject } from './game-object';
+import { BlendMode } from './enums';
+import { BackBufferOptions, BackBuffer } from './back-buffer';
 
 export abstract class GameLayer {
     layers: GameLayer[];

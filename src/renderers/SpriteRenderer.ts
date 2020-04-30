@@ -1,8 +1,7 @@
 import { mat4 } from 'gl-matrix';
-import { Shader } from '../shader';
-import { Texture2D } from '../texture-2d';
-import { ShaderSource } from '../shader';
-import { GameContext } from '../../';
+import { Shader, ShaderSource } from '../core/shader';
+import { GameContext } from '../game-context';
+import { Texture2D } from '../core/texture-2d';
 
 export interface SpriteRenderOptions {
     position: [number, number];

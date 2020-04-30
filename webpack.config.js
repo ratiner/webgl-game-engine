@@ -1,24 +1,41 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     mode: 'development',
-    entry: './src/app.ts',
-    devtool: 'inline-source-map',
+    entry: {
+        index: './src/index.ts',
+        'index.min': './src/index.ts',
+    },
+    devtool: 'source-map',
     output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/',
+        path: path.resolve(__dirname, 'dist/'),
+        filename: 'bundles/[name].js',
+        libraryTarget: 'umd',
+        library: 'webgl-game-engine',
+        umdNamedDefine: true,
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+            name: 'vendor.min',
+        },
+        minimizer: [
+            new UglifyJsPlugin({
+                cache: true,
+                parallel: true,
+                include: /\.min\.js$/,
+            }),
+        ],
     },
     module: {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: ['ts-loader'],
+                loader: 'ts-loader',
                 exclude: /node_modules/,
             },
+            { test: /\.js$/, exclude: /node_modules/ },
         ],
     },
     resolve: {
@@ -28,13 +45,7 @@ module.exports = {
             src: path.resolve(__dirname, 'src'),
         },
     },
-    plugins: [
-        new CleanWebpackPlugin(),
-        new CopyWebpackPlugin([{ from: './src/assets', to: './assets' }]),
-        new HtmlWebpackPlugin({
-            template: './src/index.html',
-        }),
-    ],
+    plugins: [],
     devServer: {
         contentBase: './dist',
     },
