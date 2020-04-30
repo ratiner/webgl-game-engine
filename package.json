@@ -1,7 +1,7 @@
 {
     "name": "webgl-game-engine",
     "version": "0.0.1",
-    "description": "",
+    "description": "A simple game engine based on WebGL 2",
     "private": true,
     "main": "./cjs/index.js",
     "module": "./esm/index.js",
@@ -15,9 +15,25 @@
         "publish": "cd dist && npm publish && cd ../",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": [],
-    "author": "Roman Ratiner",
-    "license": "ISC",
+    "keywords": [
+        "WebGL",
+        "Game"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/ratiner/webgl-game-engine#readme",
+    "bugs": {
+        "url": "https://github.com/ratiner/webgl-game-engine/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ratiner/webgl-game-engine.git"
+    },
+    "contributors": [
+        {
+            "name": "Roman Ratiner",
+            "email": "roman@ratiner.net"
+        }
+    ],
     "devDependencies": {
         "ts-loader": "^7.0.1",
         "typescript": "^3.8.3",
