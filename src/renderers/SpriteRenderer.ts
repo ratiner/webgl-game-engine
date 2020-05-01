@@ -34,6 +34,7 @@ export class SpriteRenderer {
         const gl = this.context.gl;
 
         this.shader.use();
+        this.shader.setMatrix4('projection', this.context.projection.value);
 
         // transfom
         const model = mat4.create();

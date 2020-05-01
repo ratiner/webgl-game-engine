@@ -1,7 +1,7 @@
-import { mat4 } from 'gl-matrix';
 import { ResourceManager } from './core/resource-manager';
 import { BackBuffer } from './core/back-buffer';
 import { BlendMode } from './core/enums';
+import { Projection, ProjectionType } from './core/projection';
 
 export abstract class GameContext {
     abstract setup(): void;
@@ -13,8 +13,9 @@ export abstract class GameContext {
         return this.canvas.height;
     }
 
-    resources: ResourceManager;
-    gl: WebGL2RenderingContext;
+    readonly gl: WebGL2RenderingContext;
+    readonly projection: Projection;
+    readonly resources: ResourceManager;
 
     private host: HTMLElement;
     private canvas: HTMLCanvasElement;
@@ -23,7 +24,7 @@ export abstract class GameContext {
         // Setup
         this.canvas = document.createElement('canvas');
         this.canvas.style.backgroundColor = 'black';
-        this.canvas.style.overflow = 'hidden'; // Prevents white spacesw hen resizing (where scrolls used to be)
+        this.canvas.style.overflow = 'hidden'; // Prevents white spaces when resizing (where scrolls used to be)
 
         // Initialize WebGL Context
         this.gl = this.canvas.getContext('webgl2');
@@ -32,6 +33,7 @@ export abstract class GameContext {
 
         // Initialize Engine
         this.resources = new ResourceManager(this.gl);
+        this.projection = new Projection();
 
         this.setup(); // Let user handle additional setup stuff
     }
@@ -48,9 +50,9 @@ export abstract class GameContext {
         this.canvas.height = height;
 
         // Set Projection
-        const projection = mat4.create();
-        mat4.ortho(projection, 0, width, height, 0, -1, 1);
-        this.resources.setShaderProjection(projection);
+        if (this.projection.type === ProjectionType.Adaptive) {
+            this.projection.setOrthographic(0, width, height, 0, -1, 1);
+        }
     }
 
     attach(hostElement: HTMLElement): void {

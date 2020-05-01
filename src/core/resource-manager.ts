@@ -17,12 +17,6 @@ export class ResourceManager {
         return this.shaders[shaderSource.id];
     }
 
-    setShaderProjection(projection: Float32List): void {
-        Object.keys(this.shaders).forEach((id) => {
-            this.shaders[id].use().setMatrix4('projection', projection);
-        });
-    }
-
     clear(): void {
         const gl = this.gl;
 

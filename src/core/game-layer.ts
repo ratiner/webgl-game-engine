@@ -16,8 +16,10 @@ export abstract class GameLayer {
 
         this.layerBuffer = new BackBuffer(context, opts);
         this.blendMode = BlendMode.ALPHA;
+        this.setup();
     }
 
+    abstract setup(): void;
     abstract update(): void;
 
     draw(buffer: BackBuffer = null): void {
@@ -42,5 +44,6 @@ export abstract class GameLayer {
 }
 
 export class SimpleGameLayer extends GameLayer {
+    setup(): void {}
     update(): void {}
 }
