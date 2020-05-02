@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { mat4, vec4 } from 'gl-matrix';
 import { Shader, ShaderSource } from '../core/shader';
 import { GameContext } from '../game-context';
 
@@ -16,7 +16,6 @@ export interface GradientStep {
 export class GradientRenderer {
     private shader: Shader;
     private vertexBuffer: WebGLBuffer;
-    private colorsBuffer: WebGLBuffer;
     private indices: number[];
     private indexBuffer: WebGLBuffer;
 
@@ -33,11 +32,6 @@ export class GradientRenderer {
         this.indexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-        this.colorsBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorsBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.getColorsMatrix(), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
 
@@ -65,12 +59,11 @@ export class GradientRenderer {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         positionIndex = this.shader.getAttributeIndex('vertex');
         gl.enableVertexAttribArray(positionIndex);
-        gl.vertexAttribPointer(positionIndex, 2, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(positionIndex, 2, gl.FLOAT, false, 6 * 4, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorsBuffer);
         positionIndex = this.shader.getAttributeIndex('color');
         gl.enableVertexAttribArray(positionIndex);
-        gl.vertexAttribPointer(positionIndex, 4, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(positionIndex, 4, gl.FLOAT, false, 6 * 4, 2 * 4);
 
         gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
 
@@ -82,21 +75,11 @@ export class GradientRenderer {
     private getVertexMatrix(): Float32Array {
         // prettier-ignore
         return new Float32Array([ 
-            0, 1, 
-            0, 0,
-            1, 0,
-            1, 1
-        ]);
-    }
-
-    private getColorsMatrix(): Float32Array {
-        // prettier-ignore
-        return new Float32Array([ 
-        //   R    G    B    A
-            0.0, 1.0, 0.0, 1.0, 
-            0.0, 1.0, 0.0, 1.0, 
-            0.0, 0.0, 1.0, 1.0, 
-            0.0, 0.0, 1.0, 1.0, 
+        //   POS   R    G    B    A
+            0, 1, 0.0, 1.0, 0.0, 1.0, 
+            0, 0, 0.0, 1.0, 0.0, 1.0, 
+            1, 0, 0.0, 0.0, 1.0, 1.0, 
+            1, 1, 0.0, 0.0, 1.0, 1.0,
         ]);
     }
 }
@@ -106,25 +89,25 @@ export const GradientShader: ShaderSource = {
 
     vertexShader: `
     attribute vec2 vertex; //position
-    attribute vec4 color; //colors
+    attribute vec4 color;
+
+    varying vec4 vs_color;
 
     uniform mat4 projection;
     uniform mat4 model;
-
-    varying vec4 out_color;
+    
     void main() {
+        vs_color = color;
         gl_Position = projection * model * vec4(vertex, 0.0, 1.0);
-        out_color = color;
     }
     `,
 
     fragmentShader: `
     precision mediump float;
-
-    varying vec4 out_color;
+    varying vec4 vs_color;
 
     void main() {
-        gl_FragColor = out_color;
+        gl_FragColor = vs_color;
     }
     `,
 };

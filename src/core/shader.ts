@@ -76,13 +76,33 @@ export class Shader {
         this.gl.uniform2f(this.gl.getUniformLocation(this.program, name), vec2[0], vec2[1]);
     }
 
-    public setVector3fXyz(name: string, x: number, y: number, z: number, useShader: boolean = false): void {}
+    public setVector3fXyz(name: string, x: number, y: number, z: number, useShader: boolean = false): void {
+        if (useShader) {
+            this.use();
+        }
+        this.gl.uniform3f(this.gl.getUniformLocation(this.program, name), x, y, z);
+    }
 
-    public setVector3fVec3(name: string, vec3: any, useShader: boolean = false): void {}
+    public setVector3fVec3(name: string, vec3: [number, number, number], useShader: boolean = false): void {
+        if (useShader) {
+            this.use();
+        }
+        this.gl.uniform3f(this.gl.getUniformLocation(this.program, name), vec3[0], vec3[1], vec3[2]);
+    }
 
-    public setVector4fXyz(name: string, x: number, y: number, z: number, w: number, useShader: boolean = false): void {}
+    public setVector4fXyz(name: string, x: number, y: number, z: number, w: number, useShader: boolean = false): void {
+        if (useShader) {
+            this.use();
+        }
+        this.gl.uniform4f(this.gl.getUniformLocation(this.program, name), x, y, z, w);
+    }
 
-    public setVector4fVec4(name: string, vec3: any, useShader: boolean = false): void {}
+    public setVector4fVec4(name: string, vec4: [number, number, number, number], useShader: boolean = false): void {
+        if (useShader) {
+            this.use();
+        }
+        this.gl.uniform4f(this.gl.getUniformLocation(this.program, name), vec4[0], vec4[1], vec4[2], vec4[3]);
+    }
 
     public setMatrix4(name: string, mat4: Float32List, useShader: boolean = false): void {
         if (useShader) {

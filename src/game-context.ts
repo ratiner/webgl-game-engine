@@ -27,7 +27,7 @@ export abstract class GameContext {
         this.canvas.style.overflow = 'hidden'; // Prevents white spaces when resizing (where scrolls used to be)
 
         // Initialize WebGL Context
-        this.gl = this.canvas.getContext('webgl2');
+        this.gl = this.canvas.getContext('webgl2', { antialias: false });
         this.gl.clearColor(0.4, 0.6, 1.0, 0.0);
         this.gl.enable(this.gl.BLEND);
 
